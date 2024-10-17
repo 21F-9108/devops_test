@@ -1,2 +1,0 @@
-# DevOPS
-Final project
