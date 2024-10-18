@@ -1,19 +1,20 @@
 // userModel.js
 
 const User = require('../src/config').collection; 
-const bcrypt = require('bcrypt');
+//');
 
 async function createUser(username, password,email) {
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log('ssss')
+    //const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const userData = {
         name: username,
-        password: hashedPassword,
+        password: password,
         email:email,
         verified:false,
     };
-
+    console.log('ssss')
     const existingUser = await User.findOne({ name: username });
     if (existingUser) {
         throw new Error('User already exists. Please choose a different username.');
@@ -34,13 +35,16 @@ async function loginUser(username, password) {
     if (!user) {
         throw new Error('User not found.');
     }
-    
-
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
+    if (password !== user.password) {
         throw new Error('Incorrect password.');
     }
+    
 
+    //const isPasswordMatch = await bcrypt.compare(password, user.password);
+    //if (!isPasswordMatch) {
+      //  throw new Error('Incorrect password.');
+   // }
+      
     return user;
 }
 

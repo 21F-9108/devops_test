@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const User = require('../src/config').collection; 
 const randomstring=require("randomstring")
 const nodemailer=require("nodemailer")
-const bcrypt = require('bcrypt');
 const {oneMinuteExpiry, threeMinuteExpiry}= require('./otpValidate') 
 const Comment = require('../model/comment');
 const Product = require('../model/product')
@@ -138,7 +137,7 @@ const updatePassword=async(req,res)=>{
             return res.render('resetPassowrd', { resetData, error:"confirm password doesnt match"})
         }
         const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+       // const hashedPassword = await bcrypt.hash(password, saltRounds);
         const data= await User.updateOne({_id:user_id},{$set: {password:hashedPassword}});
 
     } catch (error) {
