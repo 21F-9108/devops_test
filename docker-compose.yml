@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # MongoDB Service
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - my_network
+
+  # Backend Service (Node.js + Express + EJS)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./views:/usr/src/app/views
+      - ./public:/usr/src/app/public
+      - /usr/src/app/node_modules
+    networks:
+      - my_network
+    depends_on:
+      - mongodb
+    command: npx nodemon src/index.js
+
+  # Frontend Service (Static HTML, CSS, JS with Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    networks:
+      - my_network
+
+# Define volumes for persistent data storage
+volumes:
+  mongodb_data:
+
+# Define a shared network for all services
+networks:
+  my_network:
+    driver: bridge
