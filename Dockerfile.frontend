@@ -1,0 +1,11 @@
+# Use lightweight Nginx to serve static files
+FROM nginx:alpine
+
+# Copy static files to Nginx directory
+COPY ./public /usr/share/nginx/html
+
+# Expose the port for Nginx
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]

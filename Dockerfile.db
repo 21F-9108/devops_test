@@ -1,0 +1,12 @@
+# Use official MongoDB image
+FROM mongo:6.0
+
+
+# Set working directory (optional)
+WORKDIR /usr/src/database
+
+# Expose MongoDB port
+EXPOSE 27017
+
+# Start MongoDB
+CMD ["mongod"]
