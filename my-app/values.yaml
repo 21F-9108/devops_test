@@ -1,0 +1,28 @@
+# values.yaml
+
+backend:
+  image:
+    repository: my-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5000
+
+frontend:
+  image:
+    repository: my-frontend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+
+database:
+  image:
+    repository: my-db
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 27017

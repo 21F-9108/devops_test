@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
+//const connect = mongoose.connect("mongodb://localhost:27017/bookstore");
 const connect = mongoose.connect("mongodb://mongodb:27017/bookstore");
+
 
 // Check database connected or not
 connect.then(() => {

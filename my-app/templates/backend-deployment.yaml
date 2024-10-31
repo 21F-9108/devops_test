@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-backend
+  labels:
+    app: my-app-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-backend
+  template:
+    metadata:
+      labels:
+        app: my-app-backend
+    spec:
+      containers:
+        - name: my-app-backend
+          image: my-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
