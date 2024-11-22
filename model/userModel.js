@@ -14,7 +14,7 @@ async function createUser(username, password,email) {
         email:email,
         verified:false,
     };
-    console.log('ssss')
+    console.log('sssuuuus')
     const existingUser = await User.findOne({ name: username });
     if (existingUser) {
         throw new Error('User already exists. Please choose a different username.');
@@ -31,7 +31,7 @@ async function createUser(username, password,email) {
 
 
 async function loginUser(username, password) {
-        console.log('ssssss')
+        console.log('wwwwwww')
     const user = await User.findOne({ name: username });
     if (!user) {
         throw new Error('User not found.');
@@ -40,7 +40,7 @@ async function loginUser(username, password) {
 
         throw new Error('Incorrect password.');
     }
-        console.log('ssssss')
+        console.log('bbbbbbbb')
     
 
     //const isPasswordMatch = await bcrypt.compare(password, user.password);

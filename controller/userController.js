@@ -33,12 +33,14 @@ async function validate(req, res) {
 
 
 async function signup(req, res) {
+            console.log("sijjjgn")
     const { username, password,email,verified ,token} = req.body;
     try {
+            console.log("sijjgn")
         const newUser = await userModel.createUser(username, password,email,verified,token);
-        console.log("sign")
+        console.log("sighhhn")
         //sendotp(username, email, verified);
-        res.status(200).json({ message: 'Login success' });;
+
         console.log("after")
         res.render('enterotp',{ successMessage: '' })
         // res.send('User registered successfully!');
@@ -52,9 +54,9 @@ async function login(req, res) {
     const { username, password } = req.body;
     try {
         const user= await userModel.loginUser(username, password);
-        console.log("yaa");
+        console.log("yaarr");
         req.session.user_id = user._id;
-        res.status(200).json({ message: 'Login success' });;
+
         // res.send('Login successful.');
         res.render('index')
     } catch (error) {
