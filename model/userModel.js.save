@@ -1,6 +1,6 @@
 // userModel.js
 
-const User = require('../src/config').collecti;
+const User = require('../src/config').collection;
 
 async function createUser(username, password,email) {
     const saltRounds = 10;

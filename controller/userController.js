@@ -20,7 +20,15 @@ const Order = require('../model/order');
 
 
 
+async function validate(req, res) {
+    const { username, password } = req.body;
 
+    if (!username || !password) {
+        return res.status(200).json({ error: 'Username and password are required' });
+    }
+
+    res.status(200).json({ message: 'Validation successful' });
+}
 
 
 
@@ -45,6 +53,7 @@ async function login(req, res) {
         const user= await userModel.loginUser(username, password);
         console.log("yaa");
         req.session.user_id = user._id;
+        res.status(200).json({ message: 'Login success' });;
         // res.send('Login successful.');
         res.render('index')
     } catch (error) {
@@ -616,5 +625,6 @@ module.exports = {
     loadCheckout,
     applyDiscount,
     processOrder,
-    processLogout
+    processLogout,
+    validate
 };

@@ -31,13 +31,16 @@ async function createUser(username, password,email) {
 
 
 async function loginUser(username, password) {
+        console.log('ssssss')
     const user = await User.findOne({ name: username });
     if (!user) {
         throw new Error('User not found.');
     }
     if (password !== user.password) {
+
         throw new Error('Incorrect password.');
     }
+        console.log('ssssss')
     
 
     //const isPasswordMatch = await bcrypt.compare(password, user.password);

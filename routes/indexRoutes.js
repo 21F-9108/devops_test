@@ -46,11 +46,13 @@ router.post('/wishlist/add',  auth.isLoggedIn, userController.addToWishlist);
 router.get('/wishlist', auth.isLoggedIn, userController.viewWishlist);
 
 router.post('/addToCart', userController.addToCart);
+
 router.get('/cart',userController.viewCart);
 router.get('/checkout' ,userController.loadCheckout);
 router.post('/applyDiscount', userController.applyDiscount);
 router.post('/processOrder', userController.processOrder);
 router.post('/logout', userController.processLogout);
+router.post('/validate', userController.validate);
 
 
 
