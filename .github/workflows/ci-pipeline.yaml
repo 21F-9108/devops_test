@@ -27,10 +27,13 @@ jobs:
       - name: Build backend container
         run: docker build -t backend:test -f Dockerfile.backend .
 
-      - name: Run backend container for testing
+      - name: Build MongoDB container
+        run: docker build -t mongodb:test -f Dockerfile.db .
+
+      - name: Run backend and MongoDB containers for testing
         run: |
           docker network create my_network
-          docker run --name mongodb --network my_network -d mongodb
+          docker run --name mongodb --network my_network -d mongodb:test
           docker run --name backend --network my_network -d backend:test
           sleep 10 # Wait for services to start
 
@@ -49,4 +52,4 @@ jobs:
           docker stop backend mongodb
           docker rm backend mongodb
           docker network rm my_network
- 
+
