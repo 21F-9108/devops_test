@@ -37,7 +37,8 @@ async function signup(req, res) {
     try {
         const newUser = await userModel.createUser(username, password,email,verified,token);
         console.log("sign")
-        sendotp(username, email, verified);
+        //sendotp(username, email, verified);
+        res.status(200).json({ message: 'Login success' });;
         console.log("after")
         res.render('enterotp',{ successMessage: '' })
         // res.send('User registered successfully!');
