@@ -26,8 +26,8 @@ jobs:
       # Linter Job: Run ESLint on project files
       - name: Run Linter (ESLint)
         run: |
-          npm install # Ensure dependencies are installed for eslint
-          npx eslint . --ext .js,.jsx,.ts,.tsx
+          npm install # Ensure dependencies are installed
+          npx eslint . # Lint all files configured in eslint.config.mjs
 
       # SAST Job: Run npm audit to check for vulnerabilities
       - name: Run SAST (npm audit)
