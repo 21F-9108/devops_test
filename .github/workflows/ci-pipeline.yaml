@@ -104,7 +104,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
-          category: 'security'
+          category: 'security-v1'
           output: 'results/javascript.sarif'  #  path for SARIF file
 
       - name: Upload SARIF results
