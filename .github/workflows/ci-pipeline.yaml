@@ -85,12 +85,13 @@ jobs:
           docker tag mongodb:test ${{ secrets.DOCKER_USERNAME }}/mongodb:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/mongodb:latest
 
-      # Step 13: Run Static Application Security Testing (SAST)
-      - name: Run SAST (Static Code Analysis)
-        uses: actions/github/codeql-action/init@v2
+      # Step 13: Initialize CodeQL for SAST
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
         with:
           languages: javascript
 
+      # Step 14: Perform CodeQL Analysis
       - name: Perform CodeQL Analysis
-        uses: actions/github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v2
 
