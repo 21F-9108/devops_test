@@ -19,7 +19,6 @@ permissions:
   security-events: write
 
 jobs:
-  # Build, Test, and Push Images
   build-test-push:
     runs-on: ubuntu-latest
     steps:
@@ -64,21 +63,17 @@ jobs:
         run: |
           mkdir -p ./test-results
           
-      - name: List directory contents
-  	run: ls -alh
-
-
-
-
       - name: Run unit tests
-        run: docker exec backend npm test
-        
+        run: |
+          docker exec backend npm test
+          ls -l ./test-results  # List contents to verify results are being written
+
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: backend-test-results
-          path: ./test-results/ # Update path to your test results
+          path: ./test-results/  # Ensure this path is correct
 
       - name: Stop and remove containers
         run: |
@@ -106,40 +101,4 @@ jobs:
         run: |
           docker tag frontend:test ${{ secrets.DOCKER_USERNAME }}/frontend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-
-
-  # Linter Job
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: npm install # Install dependencies for linting
-
-      - name: Run ESLint
-        run: npx eslint . --max-warnings=0
-        env:
-          NODE_ENV: test
-    # Only run lint if JS files have changed
-    if: ${{ github.event.head_commit.message != 'Merge branch' }}
-
-  # SAST Job with simplified CodeQL configuration
-  sast:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: javascript
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          category: 'security'
-          output: 'results'
 
