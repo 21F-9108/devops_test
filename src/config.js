@@ -8,7 +8,7 @@ connect.then(() => {
     console.log("Database Connected Successfully");
 })
 .catch(() => {
-    console.log("Database cannot be Connected,oops");
+    console.log("Database cannot be efConnected");
 })
 
 // Create Schema

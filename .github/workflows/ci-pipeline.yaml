@@ -63,6 +63,12 @@ jobs:
       - name: Ensure test-results directory exists
         run: |
           mkdir -p ./test-results
+          
+      - name: List directory contents
+  	run: ls -alh
+
+
+
 
       - name: Run unit tests
         run: docker exec backend npm test
@@ -100,4 +106,40 @@ jobs:
         run: |
           docker tag frontend:test ${{ secrets.DOCKER_USERNAME }}/frontend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+
+
+  # Linter Job
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install # Install dependencies for linting
+
+      - name: Run ESLint
+        run: npx eslint . --max-warnings=0
+        env:
+          NODE_ENV: test
+    # Only run lint if JS files have changed
+    if: ${{ github.event.head_commit.message != 'Merge branch' }}
+
+  # SAST Job with simplified CodeQL configuration
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: 'security'
+          output: 'results'
 
