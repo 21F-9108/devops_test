@@ -24,7 +24,7 @@ async function validate(req, res) {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return res.status(200).json({ error: 'Username and password are required' });
+        return res.status(400).json({ error: 'Username and password are required' });
     }
 
     res.status(200).json({ message: 'Validation successful' });
