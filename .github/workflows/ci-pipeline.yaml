@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main
-      
+
 permissions:
   # Grant write access to security events for uploading SARIF results
   security-events: write
@@ -28,17 +28,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docker-
 
+      # Backend Docker build, run, and push
       - name: Build backend container
         run: docker build -t backend:test -f Dockerfile.backend .
 
       - name: Build MongoDB container
         run: docker build -t mongodb:test -f Dockerfile.db .
 
-      - name: Run backend and MongoDB containers for testing
+      - name: Build frontend container
+        run: docker build -t frontend:test -f Dockerfile.frontend .
+
+      - name: Run backend, MongoDB, and frontend containers for testing
         run: |
           docker network create my_network
           docker run --name mongodb --network my_network -d mongodb:test
           docker run --name backend --network my_network -d backend:test
+          docker run --name frontend --network my_network -d frontend:test
           sleep 10 # Wait for services to start
 
       - name: Run unit tests
@@ -53,8 +58,8 @@ jobs:
 
       - name: Stop and remove containers
         run: |
-          docker stop backend mongodb
-          docker rm backend mongodb
+          docker stop backend mongodb frontend
+          docker rm backend mongodb frontend
           docker network rm my_network
 
       - name: Log in to DockerHub
@@ -72,6 +77,11 @@ jobs:
         run: |
           docker tag mongodb:test ${{ secrets.DOCKER_USERNAME }}/mongodb:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/mongodb:latest
+
+      - name: Tag and Push Frontend Image
+        run: |
+          docker tag frontend:test ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
   # Linter Job
   lint:
@@ -105,5 +115,4 @@ jobs:
         with:
           category: 'security'
           output: 'results'
-          
       
