@@ -106,14 +106,4 @@ jobs:
           category: 'security'
           output: 'results'
           
-      - name: List results directory
-        run: |
-          echo "Listing files in the results directory"
-          ls -la results
-
-      - name: Upload SARIF Results
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'results/javascript.sarif'  # Ensure this path is correct
-          category: 'security-${{ github.run_id }}'  # Same unique category here
-
+      
