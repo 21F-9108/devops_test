@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  # Grant write access to security events for uploading SARIF results
+  security-events: write
+
 jobs:
   # Build, Test, and Push Images
   build-test-push:
@@ -84,7 +88,7 @@ jobs:
         env:
           NODE_ENV: test
 
-  # SAST Job with simplified CodeQL configuration
+  # SAST Job
   sast:
     runs-on: ubuntu-latest
     steps:
@@ -101,4 +105,19 @@ jobs:
         with:
           category: 'security'
           output: 'results'
+
+      - name: Upload SARIF results as artifact (if CodeQL fails to upload)
+        uses: actions/upload-artifact@v3
+        with:
+          name: codeql-sarif-results
+          path: ./results/javascript.sarif
+
+  # CodeQL SARIF Upload
+  upload-sarif-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload SARIF Results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ./results/javascript.sarif
 
