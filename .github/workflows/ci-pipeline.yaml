@@ -1,4 +1,25 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.js'      # Run jobs only if JS files are changed
+      - 'Dockerfile.*'  # Run jobs if Dockerfiles are changed
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.js'
+      - 'Dockerfile.*'
+
+permissions:
+  # Grant write access to security events for uploading SARIF results
+  security-events: write
+
 jobs:
+  # Build, Test, and Push Images
   build-test-push:
     runs-on: ubuntu-latest
     steps:
@@ -12,6 +33,14 @@ jobs:
           key: ${{ runner.os }}-docker-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-docker-
+
+      - name: Set up Node.js cache for dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       # Backend Docker build, run, and push
       - name: Build backend container
@@ -31,26 +60,25 @@ jobs:
           docker run --name frontend --network my_network -d frontend:test
           sleep 10 # Wait for services to start
 
-      - name: Run unit tests
-        run: docker exec backend npm test
-
-      # Check if the test results directory exists
+      # Check if test results directory exists
       - name: Check if test results directory exists
         run: |
           if [ -d "./test-results" ]; then
             echo "Directory exists."
           else
             echo "Directory does not exist."
-            exit 1  # Optionally fail the job if the directory doesn't exist
+            exit 1  # Fail the job if directory doesn't exist
           fi
 
-      # Save test results only if the directory exists
+      - name: Run unit tests
+        run: docker exec backend npm test
+        
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: backend-test-results
-          path: ./test-results/  # Path to your test results
+          path: ./test-results/ # Update path to your test results
 
       - name: Stop and remove containers
         run: |
@@ -78,4 +106,39 @@ jobs:
         run: |
           docker tag frontend:test ${{ secrets.DOCKER_USERNAME }}/frontend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+
+  # Linter Job
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install # Install dependencies for linting
+
+      - name: Run ESLint
+        run: npx eslint . --max-warnings=0
+        env:
+          NODE_ENV: test
+    # Only run lint if JS files have changed
+    if: ${{ github.event.head_commit.message != 'Merge branch' }}
+
+  # SAST Job with simplified CodeQL configuration
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: 'security'
+          output: 'results'
 
