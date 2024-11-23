@@ -9,14 +9,13 @@ on:
       - main
 
 jobs:
+  # Build, Test, and Push Images
   build-test-push:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout Code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set Up Docker Cache
       - name: Set up Docker cache
         uses: actions/cache@v3
         with:
@@ -25,21 +24,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docker-
 
-      # Step 3: Lint Code with ESLint
-      - name: Install dependencies and run linter
-        run: |
-          npm install # Ensure dependencies are installed
-          npx eslint . # Lint all files configured in eslint.config.mjs
-
-      # Step 4: Build Backend Container
       - name: Build backend container
         run: docker build -t backend:test -f Dockerfile.backend .
 
-      # Step 5: Build MongoDB Container
       - name: Build MongoDB container
         run: docker build -t mongodb:test -f Dockerfile.db .
 
-      # Step 6: Run Backend and MongoDB Containers for Testing
       - name: Run backend and MongoDB containers for testing
         run: |
           docker network create my_network
@@ -47,11 +37,9 @@ jobs:
           docker run --name backend --network my_network -d backend:test
           sleep 10 # Wait for services to start
 
-      # Step 7: Run Unit Tests
       - name: Run unit tests
         run: docker exec backend npm test
 
-      # Step 8: Save Test Results
       - name: Save test results
         if: always()
         uses: actions/upload-artifact@v3
@@ -59,39 +47,55 @@ jobs:
           name: backend-test-results
           path: ./test-results/ # Update path to your test results
 
-      # Step 9: Stop and Remove Containers
       - name: Stop and remove containers
         run: |
           docker stop backend mongodb
           docker rm backend mongodb
           docker network rm my_network
 
-      # Step 10: Log In to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 11: Tag and Push Backend Image
       - name: Tag and Push Backend Image
         run: |
           docker tag backend:test ${{ secrets.DOCKER_USERNAME }}/backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
-      # Step 12: Tag and Push MongoDB Image
       - name: Tag and Push MongoDB Image
         run: |
           docker tag mongodb:test ${{ secrets.DOCKER_USERNAME }}/mongodb:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/mongodb:latest
 
-      # Step 13: Initialize CodeQL for SAST
+  # Linter Job
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install # Install dependencies for linting
+
+      - name: Run ESLint
+        run: npx eslint . --max-warnings=0
+        env:
+          NODE_ENV: test
+
+  # SAST Job
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: javascript
 
-      # Step 14: Perform CodeQL Analysis
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
