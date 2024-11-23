@@ -89,6 +89,7 @@ jobs:
           NODE_ENV: test
 
   # SAST Job with simplified CodeQL configuration
+  
   sast:
     runs-on: ubuntu-latest
     steps:
@@ -98,11 +99,17 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: javascript
+          languages: javascript  
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
           category: 'security'
-          output: 'results'
+          output: 'results/javascript.sarif'  #  path for SARIF file
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v2  # Upload SARIF to GitHub for review
+        with:
+          sarif_file: results/javascript.sarif  # Specify the location of SARIF file
+          
 
