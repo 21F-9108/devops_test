@@ -8,6 +8,9 @@ on:
     branches:
       - main
       
+permissions:
+  # Grant write access to security events for uploading SARIF results
+  security-events: write
 
 jobs:
   # Build, Test, and Push Images
