@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**/*.js'      # Run jobs only if JS files are changed
+      - 'Dockerfile.*'  # Run jobs if Dockerfiles are changed
   pull_request:
     branches:
       - main
+    paths:
+      - '**/*.js'
+      - 'Dockerfile.*'
 
 permissions:
   # Grant write access to security events for uploading SARIF results
@@ -27,6 +33,14 @@ jobs:
           key: ${{ runner.os }}-docker-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-docker-
+
+      - name: Set up Node.js cache for dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       # Backend Docker build, run, and push
       - name: Build backend container
@@ -97,6 +111,8 @@ jobs:
         run: npx eslint . --max-warnings=0
         env:
           NODE_ENV: test
+    # Only run lint if JS files have changed
+    if: ${{ github.event.head_commit.message != 'Merge branch' }}
 
   # SAST Job with simplified CodeQL configuration
   sast:
@@ -115,4 +131,4 @@ jobs:
         with:
           category: 'security'
           output: 'results'
-      
+
